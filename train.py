@@ -8,7 +8,7 @@ def run_training(script, configs, output_dir, log_dir, num_workers, batch_size, 
     cmd = [
         'CUDA_VISIBLE_DEVICES=' + gpus, 'torchrun',
         '--master_port', str(port),
-        '--nproc_per_node=8',
+        '--nproc_per_node='+str(len(gpus)),
         script,
         '--configs', configs,
         '--accum_iter', str(acc_iter),
@@ -37,6 +37,7 @@ if __name__ == "__main__":
     parser.add_argument('--data_path', type=str, required=True, help='Path to the dataset')
     parser.add_argument('--gpus', type=str, default="0,1,2,3,4,5,6,7", help='Visible GPUs, default: "0,1,2,3,4,5,6,7"')
     parser.add_argument('--train_type', type=str, choices=['vae', 'diffusion', 'both'], default='both', help='Training type to run: vae, diffusion, or both')
+    parser.add_argument('--category', type=str, choices=['chair', 'cabinet', 'table', 'sofa', 'bed', 'shelf', 'all'], default='chair', help='Category to train on')
 
     args = parser.parse_args()
     
@@ -44,43 +45,47 @@ if __name__ == "__main__":
     data_path = args.data_path
     gpus = args.gpus
     train_type = args.train_type
+    category = args.category
 
-    if train_type in ['vae', 'both']:
-        # Train Triplane VAE
-        run_training(
-            script="train_triplane_vae.py",
-            configs="../configs/train_triplane_vae.yaml",
-            output_dir=os.path.join(base_dir, "ae/chair"),
-            log_dir=os.path.join(base_dir, "ae/chair"),
-            num_workers=8,
-            batch_size=22,
-            epochs=200,
-            warmup_epochs=5,
-            dist_eval=True,
-            category="chair",
-            data_path=data_path,
-            replica=5,
-            clip_grad=0.35,
-            port=15000,
-            gpus=gpus
-        )
+    categories = [category] if category != 'all' else ['chair', 'cabinet', 'table', 'sofa', 'bed', 'shelf']
 
-    if train_type in ['diffusion', 'both']:
-        # Train Triplane Diffusion
-        run_training(
-            script="train_triplane_diffusion.py",
-            configs="../configs/train_triplane_diffusion.yaml",
-            output_dir=os.path.join(base_dir, "dm/debug"),
-            log_dir=os.path.join(base_dir, "dm/debug"),
-            num_workers=8,
-            batch_size=22,
-            epochs=1000,
-            warmup_epochs=40,
-            dist_eval=True,
-            category="chair",
-            data_path=data_path,
-            replica=5,
-            ae_path=os.path.join(base_dir, "ae/chair", "best-checkpoint.pth"),
-            port=15004,
-            gpus=gpus
-        )
+    for category in categories:
+        if train_type in ['vae', 'both']:
+            # Train Triplane VAE
+            run_training(
+                script="disco/training/train_triplane_vae.py",
+                configs="disco/configs/train_triplane_vae.yaml",
+                output_dir=os.path.join(base_dir, f"ae/{category}"),
+                log_dir=os.path.join(base_dir, f"ae/{category}"),
+                num_workers=8,
+                batch_size=22,
+                epochs=200,
+                warmup_epochs=5,
+                dist_eval=True,
+                category=category,
+                data_path=data_path,
+                replica=5,
+                clip_grad=0.35,
+                port=15000,
+                gpus=gpus
+            )
+
+        if train_type in ['diffusion', 'both']:
+            # Train Triplane Diffusion
+            run_training(
+                script="disco/training/train_triplane_diffusion.py",
+                configs="disco/configs/train_triplane_diffusion.yaml",
+                output_dir=os.path.join(base_dir, f"dm/{category}"),
+                log_dir=os.path.join(base_dir, f"dm/{category}"),
+                num_workers=8,
+                batch_size=22,
+                epochs=1000,
+                warmup_epochs=40,
+                dist_eval=True,
+                category=category,
+                data_path=data_path,
+                replica=5,
+                ae_path=os.path.join(base_dir, f"ae/{category}", "best-checkpoint.pth"),
+                port=15004,
+                gpus=gpus
+            )
