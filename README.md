@@ -28,7 +28,7 @@ pip install -e .
    - After downloading, place all the data under the `LASA` directory.
    - Unzip `align_mat_all.zip` manually.
 
-2. **Unzip Additional Data**
+2. **Unzip All Data**
    - You can use the provided script to unzip all data in `occ_data` and `other_data` directories.
    - Run the script to unzip the data:
      ```sh
