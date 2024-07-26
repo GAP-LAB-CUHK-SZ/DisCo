@@ -1,6 +1,31 @@
-# DisCo:Diffusion-based Cross-modal Shape Reconstruction
+# DisCo: Diffusion-based Cross-modal Shape Reconstruction
 
-## Installation
+## ✨ Overview
+This repository contains code, models, and demos for a Cross-modal Shape Reconstruction Model called DisCo. Key features:
+* Utilizes Triplane Diffusion Transformers (Triplane-DiT) for memory-efficient 3D reconstruciotn
+* Robustly processes multi-view images, adeptly handling real-world challenges such as occlusion and motion blur
+* Seamlessly integrates point cloud and posed image data and achieve metric-scale 3D reconstructions
+* Trained on high-quality 3D datasets (LASA, ABO, 3DFRONT, ShapeNet)
+
+<p align="center">
+  <img src="asset/teaser.png" >
+</p>
+
+## Contents
+* [Environment Setup](##-Environment-Setup)
+* [Inference](#Inference)
+* [Data Prepration](#Data-Preparation)
+* [Train](#Train)
+* [Acknowledgement](#Acknowledgements)
+* [Citation](#Bibtex)
+
+## Environment Setup
+
+<details> <summary>Hardware</summary>
+We train our model on 8x A100 GPUs with a batch size of 22 per GPU. 
+</details>
+
+<details> <summary>Setup environment</summary>
 The following steps have been tested on Ubuntu20.04.
 - You must have an NVIDIA graphics card with at least 12GB VRAM and have [CUDA](https://developer.nvidia.com/cuda-downloads) installed.
 - Install `Python >= 3.8`.
@@ -21,6 +46,9 @@ pip install -r requirements.txt
 ```sh
 pip install -e .
 ```
+</details>
+
+## Inference
 
 ## Data preparation
 1. **Download and Organize Data**
@@ -35,50 +63,25 @@ pip install -e .
      python datasets_preprocess/unzip_all_data.py --unzip_occ --unzip_other
      ```
 
-3. **(Optional)Generate Augmented Partial Point Cloud**
-   
-4. **Extract Image Features**
+3. **Generate Train/Validation Splits**
    - Navigate to the `process_scripts` directory:
-     ```sh
-     cd process_scripts
      ```
-   - Run the script to extract image features:
-     ```sh
-     bash dist_extract_vit.sh
+     python datasets_preprocess/generate_split_for_arkit.py --cat arkit_chair
      ```
 
-5. **Generate Train/Validation Splits**
-   - Navigate to the `process_scripts` directory:
-     ```sh
-     cd process_scripts
-     ```
-   - For the LASA dataset, run:
-     ```sh
-     python generate_split_for_arkit.py --cat arkit_chair arkit_stool ...
-     ```
-   - For the synthetic dataset, run:
-     ```sh
-     python generate_split_for_synthetic_data.py --cat 03001627 future_chair ABO_chair future_stool ...
-     ```
+## Train
+1. **Train the Triplane-VAE Model**
+   ```sh
+   python launch.py --mode train_vae --gpus 0,1,2,3,4,5,6,7 --category chair
+   ```
 
-## Training
-All experiments are conducted on 8 A100 GPUs with a batch size of 22. Ensure you have access to similar hardware for optimal performance.
-1. **Train the VAE Model**
-   - Open the script `train_VAE.sh` with your preferred text editor and ensure the `--category` entry specifies the category you wish to train on. Possible options include:
-     - Individual categories: `chair`, `cabinet`, `table`, `sofa`, `bed`, `shelf`
-     - All categories: `all`
-     - (Make sure you have downloaded and preprocessed all necessary sub-category data as outlined in `./datasets/taxonomy.py`)
-   - Run the script to start training the VAE model:
-     ```sh
-      python train.py --gpus 0,1,2,3,4,5,6,7 --data_path ./data/ --train_type vae
-     ```
-   - Note: Ensure you use early stopping by manually stopping the training at 150 epochs if needed.
+2. **Cache Image and Triplane Features**
+   ```
+   python launch.py  --mode cache_image_features --gpus 0,1,2,3,4,5,6,7 --category chair
+   python launch.py  --mode cache_triplane_features --gpus 0,1,2,3,4,5,6,7 --category chair
+   ```
 
-2. **Pre-Extract VAE Features**
-   Comming Soon
-
-3. **Train the Diffusion Model on Synthetic Dataset**
-   Comming Soon
-
-4. **Finetune the Diffusion Model on LASA Dataset**
-   Comming Soon
+3. **Train the Triplane-Diffusion Model**
+   ```
+   python launch.py  --mode train_diffusion --gpus 0,1,2,3,4,5,6,7 --category chair
+   ```
