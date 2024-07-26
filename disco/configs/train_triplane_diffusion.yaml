@@ -62,3 +62,4 @@ dataset:
   par_prefix: "aug7_" # prefix of the filenames of the partial point cloud
   jitter_partial_train: 0.02
   jitter_partial_val: 0.0
+  use_pretrain_data: False

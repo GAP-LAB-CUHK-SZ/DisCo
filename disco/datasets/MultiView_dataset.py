@@ -52,6 +52,8 @@ class Object_Occ(data.Dataset):
 
         self.models = []
         for c_idx, c in enumerate(categories):
+            if c in ['chair', 'cabinet', 'table', 'sofa', 'bed', 'shelf']:
+                c = 'arkit_' + c
             subpath = os.path.join(self.point_folder, c)
             print(subpath)
             assert os.path.isdir(subpath)

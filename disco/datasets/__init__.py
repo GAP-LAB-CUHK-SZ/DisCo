@@ -1,6 +1,6 @@
 import torch.utils.data
 
-from disco.datasets.SingleView_dataset import Object_Occ,Object_PartialPoints_MultiImg
+from disco.datasets.MultiView_dataset import Object_Occ,Object_PartialPoints_MultiImg
 from disco.datasets.transforms import Scale_Shift_Rotate,Aug_with_Tran, Augment_Points
 from disco.datasets.taxonomy import synthetic_category_combined,synthetic_arkit_category_combined,arkit_category
 
@@ -29,7 +29,7 @@ def build_par_multiimg_dataset(split,args):
     category=args['category']
     category_list=synthetic_category_combined[category]
     if split == "train":
-        return Object_PartialPoints_MultiImg(args['data_path'], split_filename="train_par_img.json",split=split,
+        return Object_PartialPoints_MultiImg(args['data_path'], split_filename="highres_train_par_img.json",split=split,
                                 categories=category_list,
                                 transform=transform, sampling=True,
                                 num_samples=1024, return_surface=False,ret_sample=False,
@@ -38,7 +38,7 @@ def build_par_multiimg_dataset(split,args):
                                 par_prefix=args['par_prefix'],par_point_aug=args['par_point_aug'],replica=args['replica'],
                                              num_objects=args['num_objects'])
     elif split  =="val":
-        return Object_PartialPoints_MultiImg(args['data_path'], split_filename="val_par_img.json",split=split,
+        return Object_PartialPoints_MultiImg(args['data_path'], split_filename="highres_val_par_img.json",split=split,
                                 categories=category_list,
                                 transform=val_transform, sampling=False,
                                 num_samples=1024, return_surface=False,ret_sample=True,
