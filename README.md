@@ -60,13 +60,13 @@ pip install -e .
    - You can use the provided script to unzip all data in `occ_data` and `other_data` directories.
    - Run the script to unzip the data:
      ```sh
-     python datasets_preprocess/unzip_all_data.py --unzip_occ --unzip_other
+     python data/unzip_all_data.py --unzip_occ --unzip_other
      ```
 
 3. **Generate Train/Validation Splits**
    - Navigate to the `process_scripts` directory:
      ```
-     python datasets_preprocess/generate_split_for_arkit.py --cat arkit_chair
+     python data/generate_split_for_arkit.py --cat arkit_chair
      ```
 
 ## Train

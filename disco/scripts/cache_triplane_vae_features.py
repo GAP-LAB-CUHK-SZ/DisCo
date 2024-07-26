@@ -1,21 +1,19 @@
 import argparse
 import math
-import sys
-sys.path.append("..")
 import numpy as np
 import os
 import torch
-
 import trimesh
-
-from datasets import Object_Occ,Scale_Shift_Rotate
-from models import get_model
-from pathlib import Path
-import open3d as o3d
-from configs.config_utils import CONFIG
 import tqdm
-from util import misc
-from datasets.taxonomy import synthetic_arkit_category_combined
+
+import open3d as o3d
+from pathlib import Path
+
+from disco.datasets import Object_Occ,Scale_Shift_Rotate
+from disco.models import get_model
+from disco.configs.config_utils import CONFIG
+from disco.utils import misc
+from disco.datasets.taxonomy import synthetic_arkit_category_combined
 
 if __name__ == "__main__":
 

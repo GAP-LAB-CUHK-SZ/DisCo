@@ -1,6 +1,4 @@
 import os,sys
-sys.path.append("..")
-from util.simple_image_loader import Image_dataset
 from torch.utils.data import DataLoader
 import timm
 import torch
@@ -8,13 +6,16 @@ from tqdm import tqdm
 import numpy as np
 from transformers import DPTForDepthEstimation, DPTFeatureExtractor
 import argparse
-from util import misc
-from datasets.taxonomy import synthetic_arkit_category_combined
+
+from disco.utils.simple_image_loader import Image_dataset
+from disco.utils import misc
+from disco.datasets.taxonomy import synthetic_arkit_category_combined
 parser=argparse.ArgumentParser()
 
 parser.add_argument("--category",nargs="+",type=str)
-parser.add_argument("--root_dir",type=str, default="../data")
-parser.add_argument("--ckpt_path",type=str,default="../open_clip_pytorch_model.bin")
+parser.add_argument('--configs',type=str)
+parser.add_argument("--data-pth",type=str, default="./data")
+parser.add_argument("--ckpt_path",type=str,default="./data/open_clip_pytorch_model.bin")
 parser.add_argument("--batch_size",type=int,default=24)
 parser.add_argument('--world_size', default=1, type=int,
                     help='number of distributed processes')
@@ -26,11 +27,13 @@ args= parser.parse_args()
 misc.init_distributed_mode(args)
 category=args.category
 
-#dataset=Image_dataset(categories=['03001627','ABO_chair','future_chair'])
 if args.category[0]=="all":
     category=synthetic_arkit_category_combined["all"]
+elif args.category[0] in ['chair', 'cabinet', 'table', 'sofa', 'bed', 'shelf']:
+    category=['arkit_'+args.category[0]]
+
 print("loading dataset")
-dataset=Image_dataset(dataset_folder=args.root_dir,categories=category,n_px=224)
+dataset=Image_dataset(dataset_folder=args.data_pth,categories=category,n_px=224)
 num_tasks = misc.get_world_size()
 global_rank = misc.get_rank()
 sampler = torch.utils.data.DistributedSampler(
@@ -49,7 +52,7 @@ print("loading model")
 VIT_MODEL = 'vit_huge_patch14_224_clip_laion2b'
 model=timm.create_model(VIT_MODEL, pretrained=True,pretrained_cfg_overlay=dict(file=args.ckpt_path))
 model=model.eval().float().cuda()
-save_dir=os.path.join(args.root_dir,"other_data")
+save_dir=os.path.join(args.data_pth,"other_data")
 for idx,data_batch in enumerate(dataloader):
     if idx%50==0:
         print("{}/{}".format(dataloader.__len__(),idx))
