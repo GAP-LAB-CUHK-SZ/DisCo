@@ -51,7 +51,7 @@ pip install -e .
 ## Inference
 <details> <summary>Prepare Pretrained Weights</summary>
 
-* Download the pretrained weight from [BaiduYun](https://pan.baidu.com/s/10liUOaC4CXGn7bN6SQkZsw?pwd=hlf9) or [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/EiqBn0E9VANPmo0h0DMuSOUBJpR_Cy6rHIvDzlz169pcBA?e=Kd8TTz). 
+* Download the pretrained weight from [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/Eu_V8OWr7VdDj--6xzWm2AwBuJsDBOLHA2z09D29cQtq_g?e=fkEpPo). 
 
 * Put `ae`,`dm`, and `finetune_diffusion` folder under LASA/output. Only the ae and finetune_dm is needed for final evaluation:  
    * The `ae` folder stores the VAE weight, 
