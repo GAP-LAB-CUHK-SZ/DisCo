@@ -51,7 +51,7 @@ pip install -e .
 ## Inference
 <details> <summary>Prepare Pretrained Weights</summary>
 
-* Download the pretrained weight from [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/Eu_V8OWr7VdDj--6xzWm2AwBuJsDBOLHA2z09D29cQtq_g?e=fkEpPo). 
+* Download the pretrained weight from [BaiduYun](https://pan.baidu.com/s/10liUOaC4CXGn7bN6SQkZsw?pwd=hlf9) or [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/EiqBn0E9VANPmo0h0DMuSOUBJpR_Cy6rHIvDzlz169pcBA?e=Kd8TTz). 
 
 * Put `ae`,`dm`, and `finetune_diffusion` folder under LASA/output. Only the ae and finetune_dm is needed for final evaluation:  
    * The `ae` folder stores the VAE weight, 
@@ -62,9 +62,8 @@ pip install -e .
 
 ## Data preparation
 1. **Download and Organize Data**
-   - Download the preprocessed data from [BaiduYun (code: r7vs)](https://pan.baidu.com/s/1X6k82UNG-1hV_FIthnlwcQ?pwd=r7vs).
-   - After downloading, place all the data under the `LASA` directory.
-   - Unzip `align_mat_all.zip` manually.
+   - Download the preprocessed data from [prepare_data](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/Eu_V8OWr7VdDj--6xzWm2AwBuJsDBOLHA2z09D29cQtq_g?e=fkEpPo).
+   - After downloading, place all the data under the `LASA/data` directory.
 
 2. **Unzip All Data**
    - You can use the provided script to unzip all data in `occ_data` and `other_data` directories.
