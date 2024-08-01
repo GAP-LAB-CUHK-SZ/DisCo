@@ -61,23 +61,40 @@ pip install -e .
 
 
 ## Data preparation
-1. **Download and Organize Data**
-   - Download the preprocessed data from [BaiduYun (code: r7vs)](https://pan.baidu.com/s/1X6k82UNG-1hV_FIthnlwcQ?pwd=r7vs).
-   - After downloading, place all the data under the `LASA` directory.
-   - Unzip `align_mat_all.zip` manually.
+Follow the instruction in [DATA.md](https://github.com/GAP-LAB-CUHK-SZ/LASA/blob/main/arkitscene_process_script/DATA.md)
+to obtain training data.
 
-2. **Unzip All Data**
-   - You can use the provided script to unzip all data in `occ_data` and `other_data` directories.
-   - Run the script to unzip the data:
-     ```sh
-     python data/unzip_all_data.py --unzip_occ --unzip_other
-     ```
+[//]: # (1. **Download and Organize Data**)
 
-3. **Generate Train/Validation Splits**
-   - Navigate to the `process_scripts` directory:
-     ```
-     python data/generate_split_for_arkit.py --cat arkit_chair
-     ```
+[//]: # (   - Download the preprocessed data from [BaiduYun &#40;code: r7vs&#41;]&#40;https://pan.baidu.com/s/1X6k82UNG-1hV_FIthnlwcQ?pwd=r7vs&#41;.)
+
+[//]: # (   - After downloading, place all the data under the `LASA` directory.)
+
+[//]: # (   - Unzip `align_mat_all.zip` manually.)
+
+[//]: # ()
+[//]: # (2. **Unzip All Data**)
+
+[//]: # (   - You can use the provided script to unzip all data in `occ_data` and `other_data` directories.)
+
+[//]: # (   - Run the script to unzip the data:)
+
+[//]: # (     ```sh)
+
+[//]: # (     python data/unzip_all_data.py --unzip_occ --unzip_other)
+
+[//]: # (     ```)
+
+[//]: # ()
+[//]: # (3. **Generate Train/Validation Splits**)
+
+[//]: # (   - Navigate to the `process_scripts` directory:)
+
+[//]: # (     ```)
+
+[//]: # (     python data/generate_split_for_arkit.py --cat arkit_chair)
+
+[//]: # (     ```)
 
 ## Train && Evaluation
 1. **Train the Triplane-VAE Model**
