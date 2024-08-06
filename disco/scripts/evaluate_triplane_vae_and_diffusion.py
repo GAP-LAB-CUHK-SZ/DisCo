@@ -61,7 +61,6 @@ if __name__ == "__main__":
     parser.add_argument('--reso',default=128,type=int)
     parser.add_argument('--category',nargs="+",type=str)
     parser.add_argument('--eval_cd',action="store_true",default=False)
-    parser.add_argument('--use_augmentation',action="store_true",default=False)
 
     parser.add_argument('--world_size', default=1, type=int,
                         help='number of distributed processes')
@@ -83,8 +82,6 @@ if __name__ == "__main__":
         split_filename='val_par_img.json'
 
     transform = None
-    if args.use_augmentation:
-        transform=Scale_Shift_Rotate(jitter_partial=False,jitter=False,use_scale=False,angle=(-10,10),shift=(-0.1,0.1))
     dataset_val = Object_PartialPoints_MultiImg(dataset_config['data_path'], split_filename=split_filename,
                                 categories=arkit_category[args.category],split="val",
                                 transform=transform, sampling=False,

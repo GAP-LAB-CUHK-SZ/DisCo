@@ -22,10 +22,10 @@ def build_object_occ_dataset(split,args):
                                         surface_sampling=True,surface_size=args['surface_size'], replica=1)
 
 def build_par_multiimg_dataset(split,args):
-    #transform=Scale_Shift_Rotate(rot_shift_surface=False,use_scale=False,use_shift=False,use_rot=False) #fix the encoder into cannonical space
-    #transform=Scale_Shift_Rotate(rot_shift_surface=True)
     transform=Aug_with_Tran(par_jitter_sigma=args['jitter_partial_train'])
     val_transform=Aug_with_Tran(par_jitter_sigma=args['jitter_partial_val'])
+
+    '''only use synthetic dataset for training'''
     category=args['category']
     category_list=synthetic_category_combined[category]
     if split == "train":
@@ -47,17 +47,15 @@ def build_par_multiimg_dataset(split,args):
                                 par_prefix=args['par_prefix'],par_point_aug=None,replica=1)
 
 def build_finetune_par_multiimg_dataset(split,args):
-    #transform=Scale_Shift_Rotate(rot_shift_surface=False,use_scale=False,use_shift=False,use_rot=False) #fix the encoder into cannonical space
-    #transform=Scale_Shift_Rotate(rot_shift_surface=True)
     keyword=args['keyword']
     pretrain_transform=Aug_with_Tran(par_jitter_sigma=args['jitter_partial_pretrain']) #add more noise to partial points
     finetune_transform=Aug_with_Tran(par_jitter_sigma=args['jitter_partial_finetune'])
     val_transform=Aug_with_Tran(par_jitter_sigma=args['jitter_partial_val'])
 
+    '''use both synthetic dataset and LASA dataset for training'''
     pretrain_cat=synthetic_category_combined[args['category']]
     arkit_cat=arkit_category[args['category']]
     use_pretrain_data=args["use_pretrain_data"]
-    #print(arkit_cat,pretrain_cat)
     if split == "train":
         if use_pretrain_data:
             pretrain_dataset=Object_PartialPoints_MultiImg(args['data_path'], split_filename="train_par_img.json",categories=pretrain_cat,

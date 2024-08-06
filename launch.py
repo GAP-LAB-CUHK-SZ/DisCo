@@ -7,7 +7,7 @@ def run_command(cmd):
 
 def run_operation(script, configs, batch_size, data_path, gpus, output_dir=None, log_dir=None, 
                   epochs=None, warmup_epochs=None, dist_eval=False, category=None, 
-                clip_grad=None, ae_path=None, port=15000):
+                clip_grad=None, ae_path=None, port=15000, finetune=None, finetune_path=None):
     cmd = [
         'CUDA_VISIBLE_DEVICES=' + gpus,
         'python -m torch.distributed.run',
@@ -35,6 +35,10 @@ def run_operation(script, configs, batch_size, data_path, gpus, output_dir=None,
         cmd.extend(['--clip_grad', str(clip_grad)])
     if ae_path:
         cmd.extend(['--ae-pth', ae_path])
+    if finetune:
+        cmd.extend(['--finetune' , finetune])
+    if finetune_path:
+        cmd.extend(['--finetune-pth', finetune_path])
 
     run_command(cmd)
 
@@ -44,7 +48,7 @@ def train_vae(args, category):
         configs="disco/configs/train_triplane_vae.yaml",
         output_dir=os.path.join(args.base_dir, f"ae/{category}"),
         log_dir=os.path.join(args.base_dir, f"ae/{category}"),
-        batch_size=22,
+        batch_size=2,
         epochs=200,
         warmup_epochs=5,
         dist_eval=True,
@@ -95,6 +99,25 @@ def train_diffusion(args, category):
         gpus=args.gpus
     )
 
+def finetune_diffusion(args, category):
+    run_operation(
+        script="disco/scripts/finetune_triplane_diffusion.py",
+        configs="disco/configs/finetune_triplane_diffusion.yaml",
+        output_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
+        log_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
+        batch_size=22,
+        epochs=1000,
+        warmup_epochs=40,
+        dist_eval=True,
+        category=category,
+        data_path=args.data_path,
+        ae_path=os.path.join(args.base_dir, f"ae/{category}", "best-checkpoint.pth"),
+        port=15004,
+        gpus=args.gpus,
+        finetune=True,
+        finetune_path=os.path.join(args.base_dir, f"finetune_dm/{category}/best-checkpoint.pth"),
+    )
+
 def main():
     parser = argparse.ArgumentParser(description='Launch Triplane Model Training')
     parser.add_argument('--data_path', type=str, default="data", help='Path to the dataset')
@@ -122,6 +145,9 @@ def main():
             
         if args.mode in ['train_diffusion', 'all']:
             train_diffusion(args, category)
+
+        if args.mode in ["finetune_diffusion","all"]:
+            finetune_diffusion(args, category)
 
 if __name__ == "__main__":
     main()

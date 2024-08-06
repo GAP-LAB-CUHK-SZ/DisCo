@@ -108,10 +108,14 @@ to obtain training data.
    python launch.py  --mode cache_triplane_features --gpus 0,1,2,3,4,5,6,7 --category chair
    ```
 
-3. **Train the Triplane-Diffusion Model**
+3. **Train the Triplane-Diffusion Model on Synthetic dataset**
    ```
    python launch.py  --mode train_diffusion --gpus 0,1,2,3,4,5,6,7 --category chair
    ```
-
-4. **Evaluate the trained Tripalne-VAE and Tripalne-Diffusion Model**
+4. **Finetune the Triplane-Diffusion Model on LASA dataset**
+   ```
+   python launch.py  --mode finetune_diffusion --gpus 0,1,2,3,4,5,6,7 --category chair
+   ```
+   
+5**Evaluate the trained Tripalne-VAE and Tripalne-Diffusion Model**
    Comming soon
