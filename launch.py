@@ -7,12 +7,13 @@ def run_command(cmd):
 
 def run_operation(script, configs, batch_size, data_path, gpus, output_dir=None, log_dir=None, 
                   epochs=None, warmup_epochs=None, dist_eval=False, category=None, 
-                clip_grad=None, ae_path=None, port=15000, finetune=None, finetune_path=None):
+                clip_grad=None, ae_path=None, port=15000, finetune=None, finetune_path=None,replica=None):
+    print("num of gpus",len(gpus.split(',')))
     cmd = [
         'CUDA_VISIBLE_DEVICES=' + gpus,
         'python -m torch.distributed.run',
         '--master_port', str(port),
-        '--nproc_per_node=' + str(min(2, len(gpus.split(',')))),
+        '--nproc_per_node=' + str(len(gpus.split(','))),
         script,
         '--configs', configs,
         '--batch_size', str(batch_size),
@@ -39,6 +40,8 @@ def run_operation(script, configs, batch_size, data_path, gpus, output_dir=None,
         cmd.extend(['--finetune' , finetune])
     if finetune_path:
         cmd.extend(['--finetune-pth', finetune_path])
+    if replica:
+        cmd.extend(['--replica', str(replica)])
 
     run_command(cmd)
 
@@ -48,7 +51,7 @@ def train_vae(args, category):
         configs="disco/configs/train_triplane_vae.yaml",
         output_dir=os.path.join(args.base_dir, f"ae/{category}"),
         log_dir=os.path.join(args.base_dir, f"ae/{category}"),
-        batch_size=2,
+        batch_size=22,
         epochs=200,
         warmup_epochs=5,
         dist_eval=True,
@@ -56,7 +59,8 @@ def train_vae(args, category):
         data_path=args.data_path,
         clip_grad=0.35,
         port=15000,
-        gpus=args.gpus
+        gpus=args.gpus,
+        replica=5, #can choose to replicate the dataset more, if the number of samples is small such as shelf category
     )
 
 def cache_triplane_features(args, category):
@@ -96,7 +100,8 @@ def train_diffusion(args, category):
         data_path=args.data_path,
         ae_path=os.path.join(args.base_dir, f"ae/{category}", "best-checkpoint.pth"),
         port=15004,
-        gpus=args.gpus
+        gpus=args.gpus,
+        replica = 5 #can choose to replicate the dataset more, if the number of samples is small such as shelf category
     )
 
 def finetune_diffusion(args, category):
@@ -116,6 +121,7 @@ def finetune_diffusion(args, category):
         gpus=args.gpus,
         finetune=True,
         finetune_path=os.path.join(args.base_dir, f"finetune_dm/{category}/best-checkpoint.pth"),
+        replica=5, #can choose to replicate the dataset more, if the number of samples is small such as shelf category
     )
 
 def main():

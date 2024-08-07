@@ -98,7 +98,7 @@ to obtain training data.
 
 ## Train && Evaluation
 1. **Train the Triplane-VAE Model**
-   ```sh
+   ```
    python launch.py --mode train_vae --gpus 0,1,2,3,4,5,6,7 --category chair
    ```
 
