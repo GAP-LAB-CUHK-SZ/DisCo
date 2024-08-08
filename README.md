@@ -53,7 +53,7 @@ pip install -e .
 
 * Download the pretrained weight from [BaiduYun](https://pan.baidu.com/s/10liUOaC4CXGn7bN6SQkZsw?pwd=hlf9) or [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/EiqBn0E9VANPmo0h0DMuSOUBJpR_Cy6rHIvDzlz169pcBA?e=Kd8TTz). 
 
-* Put `ae`,`dm`, and `finetune_diffusion` folder under LASA/output. Only the ae and finetune_dm is needed for final evaluation:  
+* Put `ae`,`dm`, and `finetune_diffusion` folder under DisCo/output. Only the ae and finetune_dm is needed for final evaluation:  
    * The `ae` folder stores the VAE weight, 
    * `dm` folder stores the diffusion model trained on synthetic data.
    * `finetune_dm` folder stores the diffusion model finetuned on LASA dataset. 
@@ -61,8 +61,11 @@ pip install -e .
 
 
 ## Data preparation
-Follow the instruction in [DATA.md](https://github.com/GAP-LAB-CUHK-SZ/LASA/blob/main/arkitscene_process_script/DATA.md)
+1. Follow the instruction in [DATA.md](https://github.com/GAP-LAB-CUHK-SZ/LASA/blob/main/arkitscene_process_script/DATA.md)
 to obtain training data.
+<br>
+2. Download open_clip_pytorch_model.bin from [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/EiqBn0E9VANPmo0h0DMuSOUBJpR_Cy6rHIvDzlz169pcBA?e=Kd8TTz) 
+and put it under `DisCo/data` directory. This weight file is for extracting images' vit features.
 
 [//]: # (1. **Download and Organize Data**)
 

@@ -64,4 +64,4 @@ dataset:
   jitter_partial_pretrain: 0.02
   jitter_partial_finetune: 0.02
   jitter_partial_val: 0.0
-  use_pretrain_data: False
+  use_pretrain_data: True

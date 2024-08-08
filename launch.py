@@ -37,7 +37,7 @@ def run_operation(script, configs, batch_size, data_path, gpus, output_dir=None,
     if ae_path:
         cmd.extend(['--ae-pth', ae_path])
     if finetune:
-        cmd.extend(['--finetune' , finetune])
+        cmd.extend(['--finetune'])
     if finetune_path:
         cmd.extend(['--finetune-pth', finetune_path])
     if replica:
@@ -106,7 +106,7 @@ def train_diffusion(args, category):
 
 def finetune_diffusion(args, category):
     run_operation(
-        script="disco/scripts/finetune_triplane_diffusion.py",
+        script="disco/scripts/train_triplane_diffusion.py",
         configs="disco/configs/finetune_triplane_diffusion.yaml",
         output_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
         log_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
@@ -129,7 +129,7 @@ def main():
     parser.add_argument('--data_path', type=str, default="data", help='Path to the dataset')
     parser.add_argument('--gpus', type=str, default="0,1,2,3,4,5,6,7", help='Visible GPUs, default: "0,1,2,3,4,5,6,7"')
     parser.add_argument('--mode', type=str, choices=['train_vae', 'cache_triplane_features', 'cache_image_features', 
-                                                     'train_diffusion', 'all'], 
+                                                     'train_diffusion', 'finetune_diffusion','all'],
                         required=True, help='Mode to run: train_vae, cache_triplane_features, cache_image_features, train_diffusion, or all')
     parser.add_argument('--category', type=str, choices=['chair', 'cabinet', 'table', 'sofa', 'bed', 'shelf', 'all'], 
                         default='chair', help='Category to train on')
