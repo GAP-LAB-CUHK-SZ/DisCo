@@ -53,7 +53,7 @@ pip install -e .
 
 * Download the pretrained weight from [BaiduYun](https://pan.baidu.com/s/10liUOaC4CXGn7bN6SQkZsw?pwd=hlf9) or [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/EiqBn0E9VANPmo0h0DMuSOUBJpR_Cy6rHIvDzlz169pcBA?e=Kd8TTz). 
 
-* Put `ae`,`dm`, and `finetune_diffusion` folder under LASA/output. Only the ae and finetune_dm is needed for final evaluation:  
+* Put `ae`,`dm`, and `finetune_diffusion` folder under DisCo/output. Only the ae and finetune_dm is needed for final evaluation:  
    * The `ae` folder stores the VAE weight, 
    * `dm` folder stores the diffusion model trained on synthetic data.
    * `finetune_dm` folder stores the diffusion model finetuned on LASA dataset. 
@@ -61,26 +61,48 @@ pip install -e .
 
 
 ## Data preparation
-1. **Download and Organize Data**
-   - Download the preprocessed data from [prepare_data](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/Eu_V8OWr7VdDj--6xzWm2AwBuJsDBOLHA2z09D29cQtq_g?e=fkEpPo).
-   - After downloading, place all the data under the `LASA/data` directory.
+1. Follow the instruction in [DATA.md](https://github.com/GAP-LAB-CUHK-SZ/LASA/blob/main/arkitscene_process_script/DATA.md)
+to obtain training data.
+<br>
+2. Download open_clip_pytorch_model.bin from [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/EiqBn0E9VANPmo0h0DMuSOUBJpR_Cy6rHIvDzlz169pcBA?e=Kd8TTz) 
+and put it under `DisCo/data` directory. This weight file is for extracting images' vit features.
 
-2. **Unzip All Data**
-   - You can use the provided script to unzip all data in `occ_data` and `other_data` directories.
-   - Run the script to unzip the data:
-     ```sh
-     python data/unzip_all_data.py --unzip_occ --unzip_other
-     ```
+[//]: # (1. **Download and Organize Data**)
 
-3. **Generate Train/Validation Splits**
-   - Navigate to the `process_scripts` directory:
-     ```
-     python data/generate_split_for_arkit.py --cat arkit_chair
-     ```
+[//]: # (   - Download the preprocessed data from [BaiduYun &#40;code: r7vs&#41;]&#40;https://pan.baidu.com/s/1X6k82UNG-1hV_FIthnlwcQ?pwd=r7vs&#41;.)
+
+[//]: # (   - After downloading, place all the data under the `LASA` directory.)
+
+[//]: # (   - Unzip `align_mat_all.zip` manually.)
+
+[//]: # ()
+[//]: # (2. **Unzip All Data**)
+
+[//]: # (   - You can use the provided script to unzip all data in `occ_data` and `other_data` directories.)
+
+[//]: # (   - Run the script to unzip the data:)
+
+[//]: # (     ```sh)
+
+[//]: # (     python data/unzip_all_data.py --unzip_occ --unzip_other)
+
+[//]: # (     ```)
+
+[//]: # ()
+[//]: # (3. **Generate Train/Validation Splits**)
+
+[//]: # (   - Navigate to the `process_scripts` directory:)
+
+[//]: # (     ```)
+
+[//]: # (     python data/generate_split_for_arkit.py --cat arkit_chair)
+
+[//]: # (     ```)
+
 
 ## Train && Evaluation
 1. **Train the Triplane-VAE Model**
-   ```sh
+   ```
    python launch.py --mode train_vae --gpus 0,1,2,3,4,5,6,7 --category chair
    ```
 
@@ -90,10 +112,21 @@ pip install -e .
    python launch.py  --mode cache_triplane_features --gpus 0,1,2,3,4,5,6,7 --category chair
    ```
 
-3. **Train the Triplane-Diffusion Model**
+3. **Train the Triplane-Diffusion Model on Synthetic dataset**
    ```
    python launch.py  --mode train_diffusion --gpus 0,1,2,3,4,5,6,7 --category chair
    ```
-
-4. **Evaluate the trained Tripalne-VAE and Tripalne-Diffusion Model**
-   Comming soon
+4. **Finetune the Triplane-Diffusion Model on LASA dataset**
+   ```
+   python launch.py  --mode finetune_diffusion --gpus 0,1,2,3,4,5,6,7 --category chair
+   ```
+   
+5. **Evaluate the Tripalne-Diffusion Model**
+   ```
+   python launch.py  --mode evaluate --gpus 0,1,2,3,4,5,6,7 --category chair
+   ```
+    results will be saved under ./results/<category>
+6. ** Put Inference results to scene **
+    ```
+    python launch.py --mode put_resutls_to_scene 
+    ```

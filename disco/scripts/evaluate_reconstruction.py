@@ -12,7 +12,7 @@ import scipy
 import cv2
 import time
 
-from disco.datasets.Multiview_dataset import Object_PartialPoints_MultiImg
+from disco.datasets.MultiView_dataset import Object_PartialPoints_MultiImg
 from disco.datasets.transforms import Scale_Shift_Rotate
 from disco.datasets.taxonomy import arkit_category
 from disco.models import get_model
@@ -59,9 +59,8 @@ if __name__ == "__main__":
     parser.add_argument('--save_proj_img',action="store_true",default=False)
     parser.add_argument('--save_surface',action="store_true",default=False)
     parser.add_argument('--reso',default=128,type=int)
-    parser.add_argument('--category',nargs="+",type=str)
+    parser.add_argument('--category',type=str)
     parser.add_argument('--eval_cd',action="store_true",default=False)
-    parser.add_argument('--use_augmentation',action="store_true",default=False)
 
     parser.add_argument('--world_size', default=1, type=int,
                         help='number of distributed processes')
@@ -77,14 +76,9 @@ if __name__ == "__main__":
     config=CONFIG(config_path)
     dataset_config=config.config['dataset']
     dataset_config['data_path']=args.data_pth
-    if "arkit" in args.category[0]:
-        split_filename=dataset_config['keyword']+'_val_par_img.json'
-    else:
-        split_filename='val_par_img.json'
+    split_filename=dataset_config['keyword']+'_val_par_img.json'
 
     transform = None
-    if args.use_augmentation:
-        transform=Scale_Shift_Rotate(jitter_partial=False,jitter=False,use_scale=False,angle=(-10,10),shift=(-0.1,0.1))
     dataset_val = Object_PartialPoints_MultiImg(dataset_config['data_path'], split_filename=split_filename,
                                 categories=arkit_category[args.category],split="val",
                                 transform=transform, sampling=False,
@@ -112,10 +106,6 @@ if __name__ == "__main__":
     ae_config=config.config['model']['ae']
     dm_config=config.config['model']['dm']
     ae_model=get_model(ae_config).to(device)
-    if args.category[0] == "all":
-        dm_config["use_cat_embedding"]=True
-    else:
-        dm_config["use_cat_embedding"] = False
     dm_model=get_model(dm_config).to(device)
     ae_model.eval()
     dm_model.eval()

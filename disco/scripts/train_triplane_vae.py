@@ -64,7 +64,7 @@ def get_args_parser():
                         help='Perform evaluation only')
     parser.add_argument('--dist_eval', action='store_true', default=False,
                         help='Enabling distributed evaluation (recommended during training for faster monitor')
-    parser.add_argument('--num_workers', default=60, type=int)
+    parser.add_argument('--num_workers', default=20, type=int)
     parser.add_argument('--pin_mem', action='store_true',
                         help='Pin CPU memory in DataLoader for more efficient (sometimes) transfer to GPU.')
     parser.add_argument('--no_pin_mem', action='store_false', dest='pin_mem')
@@ -220,8 +220,8 @@ def main(args,config):
     start_time = time.time()
     max_iou = 0.0
     for epoch in range(args.start_epoch, args.epochs):
-        # if args.distributed:
-        #     data_loader_train.sampler.set_epoch(epoch)
+        if args.distributed:
+            data_loader_train.sampler.set_epoch(epoch)
         #test_stats = evaluate(data_loader_val, model, device)
         train_stats = train_one_epoch(
             model, criterion, data_loader_train,
@@ -230,10 +230,6 @@ def main(args,config):
             log_writer=log_writer,
             args=args
         )
-        # if args.output_dir and (epoch % 10 == 0 or epoch + 1 == args.epochs):
-        #     misc.save_model(
-        #         args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
-        #         loss_scaler=loss_scaler, epoch=epoch)
 
         if epoch % 5 == 0 or epoch + 1 == args.epochs:
             test_stats = evaluate(data_loader_val, model, device)

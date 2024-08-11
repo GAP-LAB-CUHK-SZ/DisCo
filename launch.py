@@ -5,20 +5,22 @@ import argparse
 def run_command(cmd):
     subprocess.run(' '.join(cmd), shell=True)
 
-def run_operation(script, configs, batch_size, data_path, gpus, output_dir=None, log_dir=None, 
+def run_operation(script, configs, data_path, gpus, batch_size=None , output_dir=None, log_dir=None,
                   epochs=None, warmup_epochs=None, dist_eval=False, category=None, 
-                clip_grad=None, ae_path=None, port=15000):
+                    clip_grad=None, ae_path=None, dm_path=None, port=15000, finetune=None, finetune_path=None,replica=None,output_folder=None,
+                  eval_cd=None,reso=None,save_mesh=None,save_par_points=None,save_image=None,save_surface=None):
+    print("num of gpus",len(gpus.split(',')))
     cmd = [
         'CUDA_VISIBLE_DEVICES=' + gpus,
         'python -m torch.distributed.run',
         '--master_port', str(port),
-        '--nproc_per_node=' + str(min(2, len(gpus.split(',')))),
+        '--nproc_per_node=' + str(len(gpus.split(','))),
         script,
         '--configs', configs,
-        '--batch_size', str(batch_size),
         '--data-pth', data_path
     ]
-
+    if batch_size:
+        cmd.extend(["--batch_size",str(batch_size)])
     if output_dir:
         cmd.extend(['--output_dir', output_dir])
     if log_dir:
@@ -35,6 +37,28 @@ def run_operation(script, configs, batch_size, data_path, gpus, output_dir=None,
         cmd.extend(['--clip_grad', str(clip_grad)])
     if ae_path:
         cmd.extend(['--ae-pth', ae_path])
+    if dm_path:
+        cmd.extend(['--dm-pth', dm_path])
+    if output_folder:
+        cmd.extend(['--output_folder',output_folder])
+    if finetune:
+        cmd.extend(['--finetune'])
+    if finetune_path:
+        cmd.extend(['--finetune-pth', finetune_path])
+    if replica:
+        cmd.extend(['--replica', str(replica)])
+    if eval_cd:
+        cmd.append('--eval_cd')
+    if reso:
+        cmd.extend(['--reso', str(reso)])
+    if save_mesh:
+        cmd.append('--save_mesh')
+    if save_par_points:
+        cmd.append('--save_par_points')
+    if save_image:
+        cmd.append('--save_image')
+    if save_surface:
+        cmd.append('--save_surface')
 
     run_command(cmd)
 
@@ -52,7 +76,8 @@ def train_vae(args, category):
         data_path=args.data_path,
         clip_grad=0.35,
         port=15000,
-        gpus=args.gpus
+        gpus=args.gpus,
+        replica=5, #can choose to replicate the dataset more, if the number of samples is small such as shelf category
     )
 
 def cache_triplane_features(args, category):
@@ -92,7 +117,47 @@ def train_diffusion(args, category):
         data_path=args.data_path,
         ae_path=os.path.join(args.base_dir, f"ae/{category}", "best-checkpoint.pth"),
         port=15004,
-        gpus=args.gpus
+        gpus=args.gpus,
+        replica = 5 #can choose to replicate the dataset more, if the number of samples is small such as shelf category
+    )
+
+def finetune_diffusion(args, category):
+    run_operation(
+        script="disco/scripts/train_triplane_diffusion.py",
+        configs="disco/configs/finetune_triplane_diffusion.yaml",
+        output_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
+        log_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
+        batch_size=22,
+        epochs=1000,
+        warmup_epochs=40,
+        dist_eval=True,
+        category=category,
+        data_path=args.data_path,
+        ae_path=os.path.join(args.base_dir, f"ae/{category}", "best-checkpoint.pth"),
+        port=15004,
+        gpus=args.gpus,
+        finetune=True,
+        finetune_path=os.path.join(args.base_dir, f"finetune_dm/{category}/best-checkpoint.pth"),
+        replica=5, #can choose to replicate the dataset more, if the number of samples is small such as shelf category
+    )
+
+def evaluate(args,category):
+    run_operation(
+        script="disco/scripts/evaluate_reconstruction.py",
+        configs="disco/configs/finetune_triplane_diffusion.yaml",
+        output_folder=os.path.join(f"results/{category}"),
+        category=category,
+        data_path=args.data_path,
+        ae_path=os.path.join(args.base_dir, f"ae/{category}", "best-checkpoint.pth"),
+        dm_path=os.path.join(args.base_dir, f"finetune_dm/{category}", "best-checkpoint.pth"),
+        port=15004,
+        gpus=args.gpus,
+        eval_cd=True,
+        reso=256,
+        save_mesh=True,
+        save_par_points=True,
+        save_image=True,
+        save_surface=True,
     )
 
 def main():
@@ -100,7 +165,7 @@ def main():
     parser.add_argument('--data_path', type=str, default="data", help='Path to the dataset')
     parser.add_argument('--gpus', type=str, default="0,1,2,3,4,5,6,7", help='Visible GPUs, default: "0,1,2,3,4,5,6,7"')
     parser.add_argument('--mode', type=str, choices=['train_vae', 'cache_triplane_features', 'cache_image_features', 
-                                                     'train_diffusion', 'all'], 
+                                                     'train_diffusion', 'finetune_diffusion','evaluate','all'],
                         required=True, help='Mode to run: train_vae, cache_triplane_features, cache_image_features, train_diffusion, or all')
     parser.add_argument('--category', type=str, choices=['chair', 'cabinet', 'table', 'sofa', 'bed', 'shelf', 'all'], 
                         default='chair', help='Category to train on')
@@ -122,6 +187,12 @@ def main():
             
         if args.mode in ['train_diffusion', 'all']:
             train_diffusion(args, category)
+
+        if args.mode in ["finetune_diffusion","all"]:
+            finetune_diffusion(args, category)
+
+        if args.mode in ["evaluate"]:
+            evaluate(args,category)
 
 if __name__ == "__main__":
     main()
