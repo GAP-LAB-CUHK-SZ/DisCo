@@ -120,5 +120,12 @@ and put it under `DisCo/data` directory. This weight file is for extracting imag
    python launch.py  --mode finetune_diffusion --gpus 0,1,2,3,4,5,6,7 --category chair
    ```
    
-5**Evaluate the trained Tripalne-VAE and Tripalne-Diffusion Model**
-   Comming soon
+5. **Evaluate the Tripalne-Diffusion Model**
+   ```
+   python launch.py  --mode evaluate --gpus 0,1,2,3,4,5,6,7 --category chair
+   ```
+    results will be saved under ./results/<category>
+6. ** Put Inference results to scene **
+    ```
+    python launch.py --mode put_resutls_to_scene 
+    ```

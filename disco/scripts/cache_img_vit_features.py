@@ -12,7 +12,7 @@ from disco.utils import misc
 from disco.datasets.taxonomy import synthetic_arkit_category_combined
 parser=argparse.ArgumentParser()
 
-parser.add_argument("--category",nargs="+",type=str)
+parser.add_argument("--category",type=str)
 parser.add_argument('--configs',type=str)
 parser.add_argument("--data-pth",type=str, default="./data")
 parser.add_argument("--ckpt_path",type=str,default="./data/open_clip_pytorch_model.bin")
@@ -25,12 +25,8 @@ parser.add_argument('--dist_url', default='env://',
                     help='url used to set up distributed training')
 args= parser.parse_args()
 misc.init_distributed_mode(args)
-category=args.category
 
-if args.category[0]=="all":
-    category=synthetic_arkit_category_combined["all"]
-elif args.category[0] in ['chair', 'cabinet', 'table', 'sofa', 'bed', 'shelf']:
-    category=['arkit_'+args.category[0]]
+category=synthetic_arkit_category_combined[args.category]
 
 print("loading dataset")
 dataset=Image_dataset(dataset_folder=args.data_pth,categories=category,n_px=224)

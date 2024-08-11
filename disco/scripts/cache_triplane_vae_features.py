@@ -20,7 +20,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser('', add_help=False)
     parser.add_argument('--configs',type=str,required=True)
     parser.add_argument('--ae-pth',type=str)
-    parser.add_argument("--category",nargs='+', type=str)
+    parser.add_argument("--category", type=str)
     parser.add_argument('--world_size', default=1, type=int,
                         help='number of distributed processes')
     parser.add_argument('--local_rank', default=-1, type=int)
@@ -42,10 +42,7 @@ if __name__ == "__main__":
     dataset_config['data_path']=args.data_pth
     #transform = AxisScaling((0.75, 1.25), True)
     transform=Scale_Shift_Rotate(rot_shift_surface=True,use_scale=True)
-    if len(args.category)==1 and args.category[0]=="all":
-        category=synthetic_arkit_category_combined["all"]
-    else:
-        category=args.category
+    category=synthetic_arkit_category_combined[args.category]
     train_dataset = Object_Occ(dataset_config['data_path'], split="train",
                                 categories=category,
                                 transform=transform, sampling=True,
@@ -92,6 +89,7 @@ if __name__ == "__main__":
     #model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=False)
 
     with torch.no_grad():
+        #cache the triplane features for 5 times
         for e in range(5):
             for dataloader in dataloader_list:
                 for data_iter_step, data_batch in tqdm.tqdm(enumerate(dataloader)):
@@ -104,7 +102,7 @@ if __name__ == "__main__":
                         plane_feat=torch.nn.functional.interpolate(plane_feat,scale_factor=0.5,mode='bilinear')
                         vars=torch.exp(logvars)
                         means=torch.nn.functional.interpolate(means,scale_factor=0.5,mode="bilinear")
-                        vars=torch.nn.functional.interpolate(vars,scale_factor=0.5,mode="bilinear")/4
+                        vars=torch.nn.functional.interpolate(vars,scale_factor=0.5,mode="bilinear")/4 #calibrate the variance in a reduce size
                         sample_logvars=torch.log(vars)
 
                     for j in range(means.shape[0]):

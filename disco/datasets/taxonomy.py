@@ -67,7 +67,8 @@ category_map_from_synthetic={
 
 synthetic_category_combined={
     "sofa":["future_sofa","ABO_sofa","04256520"],
-    "chair":["arkit_chair"],
+    "chair":["03001627","future_chair","ABO_chair",
+            "future_stool"],
     "table":[
         "04379243",
         "future_table",
