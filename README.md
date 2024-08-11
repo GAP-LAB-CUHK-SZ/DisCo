@@ -59,47 +59,23 @@ pip install -e .
    * `finetune_dm` folder stores the diffusion model finetuned on LASA dataset. 
 </details>
 
+## Data Preparation
 
-## Data preparation
-1. Follow the instruction in [DATA.md](https://github.com/GAP-LAB-CUHK-SZ/LASA/blob/main/arkitscene_process_script/DATA.md)
-to obtain training data.
-<br>
-2. Download open_clip_pytorch_model.bin from [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/EiqBn0E9VANPmo0h0DMuSOUBJpR_Cy6rHIvDzlz169pcBA?e=Kd8TTz) 
-and put it under `DisCo/data` directory. This weight file is for extracting images' vit features.
+Follow these steps to prepare the data for training:
 
-[//]: # (1. **Download and Organize Data**)
+1. **Obtain Training Data**
+   - Follow the instructions in [DATA.md](https://github.com/GAP-LAB-CUHK-SZ/LASA/blob/main/arkitscene_process_script/DATA.md) to obtain the necessary training data.
 
-[//]: # (   - Download the preprocessed data from [BaiduYun &#40;code: r7vs&#41;]&#40;https://pan.baidu.com/s/1X6k82UNG-1hV_FIthnlwcQ?pwd=r7vs&#41;.)
+2. **Download CLIP Model Weights**
+   - Download the `open_clip_pytorch_model.bin` file from [SharePoint](https://cuhko365.sharepoint.com/:f:/s/CUHKSZ_SSE_GAP-Lab2/EiqBn0E9VANPmo0h0DMuSOUBJpR_Cy6rHIvDzlz169pcBA?e=Kd8TTz).
+   - Place the downloaded file in the `DisCo/data` directory.
+   - This weight file is used for extracting image features using the ViT model.
 
-[//]: # (   - After downloading, place all the data under the `LASA` directory.)
+### Additional Notes
 
-[//]: # (   - Unzip `align_mat_all.zip` manually.)
-
-[//]: # ()
-[//]: # (2. **Unzip All Data**)
-
-[//]: # (   - You can use the provided script to unzip all data in `occ_data` and `other_data` directories.)
-
-[//]: # (   - Run the script to unzip the data:)
-
-[//]: # (     ```sh)
-
-[//]: # (     python data/unzip_all_data.py --unzip_occ --unzip_other)
-
-[//]: # (     ```)
-
-[//]: # ()
-[//]: # (3. **Generate Train/Validation Splits**)
-
-[//]: # (   - Navigate to the `process_scripts` directory:)
-
-[//]: # (     ```)
-
-[//]: # (     python data/generate_split_for_arkit.py --cat arkit_chair)
-
-[//]: # (     ```)
-
-
+- The weight file is specifically for extracting ViT features from images.
+- Ensure you have the necessary permissions to access the SharePoint link.
+- If you encounter any issues during the data preparation process, please refer to the project's issue tracker or contact the maintainers.
 ## Train && Evaluation
 1. **Train the Triplane-VAE Model**
    ```
