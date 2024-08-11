@@ -102,7 +102,8 @@ Follow these steps to prepare the data for training:
    python launch.py  --mode evaluate --gpus 0,1,2,3,4,5,6,7 --category chair
    ```
     results will be saved under ./results/<category>
-6. ** Put Inference results to scene **
+
+6. **Put Inference results to scene**
     ```
     python launch.py --mode put_resutls_to_scene 
     ```
