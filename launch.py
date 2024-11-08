@@ -60,8 +60,9 @@ def run_operation(script, configs, data_path, gpus, batch_size=None , output_dir
     if save_surface:
         cmd.append('--save_surface')
     if blr:
-        cmd.append(['--blr', blr])
+        cmd.extend(['--blr', str(blr)])
 
+    print(cmd)
 
     run_command(cmd)
 
@@ -141,7 +142,7 @@ def finetune_diffusion(args, category):
         port=15004,
         gpus=args.gpus,
         finetune=True,
-        finetune_path=os.path.join(args.base_dir, f"finetune_dm/{category}/best-checkpoint.pth"),
+        finetune_path=os.path.join(args.base_dir, f"dm/{category}/best-checkpoint.pth"),
         replica=5, #can choose to replicate the dataset more, if the number of samples is small such as shelf category
     )
 
