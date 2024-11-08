@@ -8,7 +8,7 @@ def run_command(cmd):
 def run_operation(script, configs, data_path, gpus, batch_size=None , output_dir=None, log_dir=None,
                   epochs=None, warmup_epochs=None, dist_eval=False, category=None, 
                     clip_grad=None, ae_path=None, dm_path=None, port=15000, finetune=None, finetune_path=None,replica=None,output_folder=None,
-                  eval_cd=None,reso=None,save_mesh=None,save_par_points=None,save_image=None,save_surface=None):
+                  eval_cd=None,reso=None,save_mesh=None,save_par_points=None,save_image=None,save_surface=None,blr=None):
     print("num of gpus",len(gpus.split(',')))
     cmd = [
         'CUDA_VISIBLE_DEVICES=' + gpus,
@@ -59,6 +59,9 @@ def run_operation(script, configs, data_path, gpus, batch_size=None , output_dir
         cmd.append('--save_image')
     if save_surface:
         cmd.append('--save_surface')
+    if blr:
+        cmd.append(['--blr', blr])
+
 
     run_command(cmd)
 
@@ -129,7 +132,8 @@ def finetune_diffusion(args, category):
         log_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
         batch_size=22,
         epochs=1000,
-        warmup_epochs=40,
+        warmup_epochs=20,
+        blr=0.0001,
         dist_eval=True,
         category=category,
         data_path=args.data_path,
