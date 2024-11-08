@@ -131,7 +131,7 @@ def finetune_diffusion(args, category):
         output_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
         log_dir=os.path.join(args.base_dir, f"finetune_dm/{category}"),
         batch_size=22,
-        epochs=1000,
+        epochs=500,
         warmup_epochs=20,
         blr=0.0001,
         dist_eval=True,
